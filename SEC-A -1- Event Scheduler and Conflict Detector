@@ -1,0 +1,59 @@
+from datetime import datetime
+
+def detect_conflicts(events):
+    """
+    Schedules events, detects conflicts, and returns a sorted schedule and conflicts.
+
+    Args:
+        events (list): List of dictionaries with event details (name, start, end).
+
+    Returns:
+        tuple: Sorted schedule and list of conflicts.
+    """
+    # Convert time strings to datetime objects for sorting and comparison
+    for event in events:
+        event['start'] = datetime.strptime(event['start'], "%H:%M")
+        event['end'] = datetime.strptime(event['end'], "%H:%M")
+
+    # Sort events by start time
+    sorted_events = sorted(events, key=lambda x: x['start'])
+
+    # Detect conflicts
+    conflicts = []
+    for i in range(len(sorted_events) - 1):
+        current_event = sorted_events[i]
+        next_event = sorted_events[i + 1]
+
+        # Check for overlap
+        if current_event['end'] > next_event['start']:
+            conflicts.append((current_event['name'], next_event['name']))
+
+    # Convert datetime back to string for output
+    for event in sorted_events:
+        event['start'] = event['start'].strftime("%H:%M")
+        event['end'] = event['end'].strftime("%H:%M")
+
+    return sorted_events, conflicts
+
+
+# Example input
+events = [
+    {"name": "Meeting A", "start": "09:00", "end": "10:00"},
+    {"name": "Meeting B", "start": "09:30", "end": "11:00"},
+    {"name": "Meeting C", "start": "11:00", "end": "12:00"}
+]
+
+# Run the function
+sorted_schedule, detected_conflicts = detect_conflicts(events)
+
+# Output results
+print("Sorted Schedule:")
+for event in sorted_schedule:
+    print(f"  - {event['name']}: Start - {event['start']}, End - {event['end']}")
+
+print("\nDetected Conflicts:")
+if detected_conflicts:
+    for conflict in detected_conflicts:
+        print(f"  - Conflict between {conflict[0]} and {conflict[1]}")
+else:
+    print("  - No conflicts detected")
