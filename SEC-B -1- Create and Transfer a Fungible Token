@@ -1,0 +1,76 @@
+class FungibleToken:
+    def __init__(self, name, symbol, initial_supply):
+        """
+        Initialize a fungible token with the given name, symbol, and initial supply.
+        Args:
+            name (str): The name of the token.
+            symbol (str): The token symbol.
+            initial_supply (int): The initial supply of tokens.
+        """
+        self.name = name
+        self.symbol = symbol
+        self.total_supply = initial_supply
+        self.balances = {"Treasury": initial_supply}  # Treasury holds the initial supply
+
+    def create_wallet(self, wallet_address):
+        """
+        Create a wallet with a balance of 0 if it doesn't already exist.
+        Args:
+            wallet_address (str): The address of the wallet.
+        """
+        if wallet_address not in self.balances:
+            self.balances[wallet_address] = 0
+
+    def transfer(self, sender, recipient, amount):
+        """
+        Transfer tokens from one wallet to another.
+        Args:
+            sender (str): The address of the sender's wallet.
+            recipient (str): The address of the recipient's wallet.
+            amount (int): The number of tokens to transfer.
+        Returns:
+            str: Result of the transfer.
+        """
+        if sender not in self.balances or self.balances[sender] < amount:
+            return "Transfer failed: Insufficient balance."
+        
+        self.create_wallet(recipient)  # Ensure recipient wallet exists
+        self.balances[sender] -= amount
+        self.balances[recipient] += amount
+        return f"Transfer successful: {amount} {self.symbol} transferred from {sender} to {recipient}."
+
+    def get_balance(self, wallet_address):
+        """
+        Get the balance of a specific wallet.
+        Args:
+            wallet_address (str): The address of the wallet.
+        Returns:
+            int: The balance of the wallet.
+        """
+        return self.balances.get(wallet_address, 0)
+
+
+# Main interaction
+print("Fungible Token Creation")
+name = input("Enter token name: ")
+symbol = input("Enter token symbol: ")
+initial_supply = int(input("Enter initial supply: "))
+
+# Create the token
+token = FungibleToken(name, symbol, initial_supply)
+
+# Output token creation details
+print(f"\nToken Created: {name} (0.0.56789)")
+print(f"Treasury Balance: {token.get_balance('Treasury')}")
+
+# Simulate a transfer
+recipient_wallet = input("\nEnter recipient wallet address: ")
+transfer_amount = int(input(f"Enter amount to transfer to {recipient_wallet}: "))
+
+# Perform the transfer
+transfer_result = token.transfer("Treasury", recipient_wallet, transfer_amount)
+
+# Output transfer details
+print(transfer_result)
+print(f"Treasury Balance: {token.get_balance('Treasury')}")
+print(f"Recipient Balance: {token.get_balance(recipient_wallet)}")
