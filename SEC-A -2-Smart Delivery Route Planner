@@ -1,0 +1,55 @@
+import math
+
+def calculate_distance(point1, point2):
+    """
+    Calculate the Euclidean distance between two points.
+    
+    Args:
+        point1 (tuple): Coordinates of the first point (x, y).
+        point2 (tuple): Coordinates of the second point (x, y).
+    
+    Returns:
+        float: Distance between the two points.
+    """
+    return math.sqrt((point1[0] - point2[0])**2 + (point1[1] - point2[1])**2)
+
+
+def optimize_route(locations):
+    """
+    Optimizes the delivery route using a greedy algorithm.
+    
+    Args:
+        locations (list): List of tuples representing delivery locations (x, y).
+    
+    Returns:
+        list: Optimized route of locations.
+        float: Total distance of the optimized route.
+    """
+    visited = [locations[0]]  # Start with the first location
+    unvisited = locations[1:]  # Remaining locations to visit
+    total_distance = 0
+
+    while unvisited:
+        current_location = visited[-1]
+        # Find the nearest unvisited location
+        nearest_location = min(unvisited, key=lambda loc: calculate_distance(current_location, loc))
+        total_distance += calculate_distance(current_location, nearest_location)
+        visited.append(nearest_location)
+        unvisited.remove(nearest_location)
+
+    # Return to the starting point
+    total_distance += calculate_distance(visited[-1], visited[0])
+    visited.append(visited[0])  # Complete the loop
+
+    return visited, total_distance
+
+
+# Example input
+locations = [(0, 0), (2, 3), (5, 1), (6, 4), (1, 6)]
+
+# Run the function
+optimized_route, total_distance = optimize_route(locations)
+
+# Output results
+print("Optimized Route:", optimized_route)
+print("Total Distance:", total_distance)
